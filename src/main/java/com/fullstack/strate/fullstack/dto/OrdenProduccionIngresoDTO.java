@@ -21,8 +21,8 @@ public class OrdenProduccionIngresoDTO {
     private String  cliente;
 
     @NotNull(message = "Fecha Válida")
-    @DateTimeFormat(pattern = "yyyy-MM-dd") // Formato de la fecha77
-    private Date    fechaEntrega;
+    //@DateTimeFormat(pattern = "yyyy-MM-dd") // Formato de la fecha77
+    private String    fechaEntrega;
 
     @NotNull(message = "Tipo producto no válido")
     @Positive(message = "Tipo producto no válido")
@@ -31,5 +31,6 @@ public class OrdenProduccionIngresoDTO {
     @NotNull(message = "Cantidad no válida")
     @Positive(message = "Cantidad no válida")
     private Integer cantidadSolicitada;
-    //private List<MateriaPrimaDTO> materiaPrima;
+
+    private List<MateriaPrimaDTO> materiaPrima;
 }

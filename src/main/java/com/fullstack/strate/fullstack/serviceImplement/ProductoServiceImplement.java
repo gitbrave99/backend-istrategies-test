@@ -30,6 +30,12 @@ public class ProductoServiceImplement implements ProductoService {
 
     @Autowired
     ProductReporterGenerator reporterGenerator;
+
+    @Override
+    public ProductoEntity findProductoById(Integer idProducto) {
+        return this.productoRepository.findByIdProducto(idProducto);
+    }
+
     @Override
     public ArrayList<ProductoDTO> getListProductsDTOs() {
      return new ArrayList<>(this.productMapper.toGetProductDTOList(this.productoRepository.findAll()));

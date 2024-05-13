@@ -58,11 +58,22 @@ public class OrdenProduccionServiceImplement implements OrdenProduccionService {
                 null, 0,null, 1,1);
     }
 
+    @Override
+    public int getLastIdOrdenProduccion() {
+        return this.opr.getLastIdOrdenProduccion();
+    }
+
     @Transactional(readOnly = false)
     @Override
     public int crearOrdenEnProduccion(Integer idOrdenProduccion, OrdenProduccionProcesoDTO op) {
         return this.opr.gestionOrdenProduccion("", null, 0, 0,
                 op.getFechaEnProduccion(), op.getIdTipoLinea(),null, idOrdenProduccion,2);
+    }
+
+    @Transactional(readOnly = false)
+    @Override
+    public int crearDetalleOrdenProduccion(Integer idOrdenProduccion, Integer idProducto, Integer cantidadUsar) {
+        return this.opr.gestionDetalleMatPrima(idOrdenProduccion, idProducto, cantidadUsar);
     }
 
     @Transactional(readOnly = false)

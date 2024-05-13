@@ -1,9 +1,7 @@
 package com.fullstack.strate.fullstack.controller;
 
-import com.fullstack.strate.fullstack.dto.ApiResponse;
-import com.fullstack.strate.fullstack.dto.OrdenProduccionFinalizadaDTO;
-import com.fullstack.strate.fullstack.dto.OrdenProduccionIngresoDTO;
-import com.fullstack.strate.fullstack.dto.OrdenProduccionProcesoDTO;
+import com.fullstack.strate.fullstack.dto.*;
+import com.fullstack.strate.fullstack.entity.OrdenProduccion;
 import com.fullstack.strate.fullstack.service.OrdenProduccionService;
 import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRException;
@@ -74,13 +72,23 @@ public class OrdenProduccionController {
     @PostMapping("")
     public ResponseEntity<?> create(@Valid @RequestBody OrdenProduccionIngresoDTO op, BindingResult bindingResult){
         // VALIDAR EXISTENCIA DE MATERIAL PRIMA ANTES DE GENERAR ORDEN
+        System.out.println("data entrada> "+ op.toString());
+        Integer lastidOrden=0;
         if (bindingResult.hasErrors()) {
             System.out.println("binding rsults: ");
             return ResponseEntity.badRequest().body(buildValidationErrorResponse(bindingResult));
         }
-        System.out.println("recpciones: "+ op.toString());
         if (this.ops.crearOrden(op) <1) {
             return buildApiResponse("No se pudo ingresar", false, HttpStatus.OK.value(), true, null);
+        }
+        lastidOrden= this.ops.getLastIdOrdenProduccion();
+        System.out.println("LAST ID_ORDEN: "+ lastidOrden);
+        if (op.getMateriaPrima() != null) {
+            for(MateriaPrimaDTO det: op.getMateriaPrima()){
+                if (this.ops.crearDetalleOrdenProduccion(lastidOrden, det.getIdProducto(), det.getCantidadUtilizar()) >0) {
+                    System.out.println("INGRESO ESPERADO: "+ lastidOrden+ " idprodu:"+ det.getIdProducto()+ " canti: "+ det.getCantidadUtilizar());
+                }
+            }
         }
         return buildApiResponse("Igresado exitosamente", true, HttpStatus.OK.value(), false, null);
     }
@@ -104,7 +112,7 @@ public class OrdenProduccionController {
             return buildApiResponse("No existe orden", false, HttpStatus.OK.value(), false, null);
         }
         if (this.ops.crearOrdenEnFinalizar(idOrdenProduccion,op) <1) {
-            return buildApiResponse("No se puedo actualizar", false, HttpStatus.OK.value(), true, null);
+            return buildApiResponse("No se puedo actualizar", false, HttpStatus.BAD_REQUEST.value(), true, null);
         }
         return buildApiResponse("Actualizado correctamente", true, HttpStatus.OK.value(), false, null);
     }

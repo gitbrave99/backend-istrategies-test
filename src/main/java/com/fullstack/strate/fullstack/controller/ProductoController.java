@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.IllegalFormatCodePointException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,6 +52,18 @@ public class ProductoController {
     @GetMapping("/list-type/{tipo}")
     public ResponseEntity<?> findByType(@PathVariable("tipo") Integer tipo){
         return ResponseEntity.status(HttpStatus.OK).body(this.productoService.getListProductsByTypoDTos(tipo));
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity<?> findByType(@RequestParam("idproducto") Integer idproducto,@RequestParam("cantusar") Integer cantusar){
+        ProductoEntity productoFound= this.productoService.findProductoById(idproducto);
+        if (productoFound == null) {
+            return buildApiResponse2("No existe el produccto", false, HttpStatus.NOT_FOUND, true, null);
+        }
+        if (productoFound.getExistencia()>=cantusar) {
+            return buildApiResponse2("cantidad disponible: "+ productoFound.getExistencia(), true, HttpStatus.OK, false, null);
+        }
+        return buildApiResponse2("La existencia del producto es menor a la requerida: "+ productoFound.getExistencia(), false, HttpStatus.CONFLICT, true, null);
     }
 
     @GetMapping("")
@@ -102,17 +115,17 @@ public class ProductoController {
             return buildApiResponse("No existe el produccto", false, HttpStatus.NOT_FOUND.value(), true, null);
         }
         estadoOrden=this.productoService.estadoProductoEnOrden(idproducto);
-        if (Objects.equals(estadoOrden, "Finalizado") || Objects.equals(estadoOrden, "En ninguna orden")){
+        if (Objects.equals(estadoOrden, "En ninguna orden")){
             result =this.productoService.delete(idproducto);
             System.out.println("resultado: "+result);
-            if (result > 0) {
+            if (result == 0 || result == -1) {
                 return buildApiResponse("Eliminado exitosamente", false, HttpStatus.OK.value(), true, null);
             }else{
                 return buildApiResponse("No se pudo eliminar el producto esta en orden de producción con estado:  "+estadoOrden
                         , false, HttpStatus.CONFLICT.value(), true, null);
             }
         }
-        return buildApiResponse(estadoOrden, false, HttpStatus.OK.value(), true, null);
+        return buildApiResponse("No se pudo eliminar el producto esta en orden de producción con estado:  "+estadoOrden, false, HttpStatus.CONFLICT.value(), true, null);
     }
 
     public static ResponseEntity<Map<String, String>> handleValidationErrors(BindingResult bindingResult) {
@@ -126,6 +139,12 @@ public class ProductoController {
         ApiResponse response = new ApiResponse(message, success, code, error, data);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    private ResponseEntity<Object> buildApiResponse2(String message, boolean success, HttpStatus code, boolean error, Object data) {
+        ApiResponse response = new ApiResponse(message, success, code.value(), error, data);
+        return ResponseEntity.status(code).body(response);
+    }
+
 
     private Map<String, Object> buildValidationErrorResponse(BindingResult bindingResult) {
         Map<String, Object> response = new HashMap<>();

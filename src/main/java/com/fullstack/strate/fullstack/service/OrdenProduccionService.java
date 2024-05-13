@@ -17,8 +17,10 @@ public interface OrdenProduccionService {
     ArrayList<OrdenProduccionDTO> findOrdenFechaEntregaEstado(Date fechaEntrega, Integer estado);
     ArrayList<OrdenProduccionDTO> findAllDTO();
     int crearOrden(OrdenProduccionIngresoDTO op);
+    int getLastIdOrdenProduccion();
 
     int crearOrdenEnProduccion(Integer idOrdenProduccion,OrdenProduccionProcesoDTO op);
+    int crearDetalleOrdenProduccion(Integer idOrdenProduccion,Integer idProducto, Integer cantidadUsar);
     int crearOrdenEnFinalizar(Integer idOrdenProduccion, OrdenProduccionFinalizadaDTO op);
     boolean existsOrdenProducccionById(Integer idOrdenProduccion);
     byte[] exportPdf(Integer estado,Date fecha) throws JRException, FileNotFoundException;
