@@ -22,7 +22,7 @@ Proyecto Fullstack para La empresa Matinsa S.A. de C.V. requiere de una aplicaci
 Si quiere crear más usuarios el endpoint `/usuario/create` lo hace enviándole el siguiente json
 ```json
 {
-    "username": "natyu",
+    "username": "username",
     "password": "123",
     "idUsuarioTipo": 1
 }
