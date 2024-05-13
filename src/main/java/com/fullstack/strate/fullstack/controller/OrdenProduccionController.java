@@ -1,7 +1,6 @@
 package com.fullstack.strate.fullstack.controller;
 
 import com.fullstack.strate.fullstack.dto.*;
-import com.fullstack.strate.fullstack.entity.OrdenProduccion;
 import com.fullstack.strate.fullstack.service.OrdenProduccionService;
 import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRException;
@@ -71,18 +70,15 @@ public class OrdenProduccionController {
 
     @PostMapping("")
     public ResponseEntity<?> create(@Valid @RequestBody OrdenProduccionIngresoDTO op, BindingResult bindingResult){
-        // VALIDAR EXISTENCIA DE MATERIAL PRIMA ANTES DE GENERAR ORDEN
-        System.out.println("data entrada> "+ op.toString());
         Integer lastidOrden=0;
         if (bindingResult.hasErrors()) {
             System.out.println("binding rsults: ");
             return ResponseEntity.badRequest().body(buildValidationErrorResponse(bindingResult));
         }
-        if (this.ops.crearOrden(op) <1) {
-            return buildApiResponse("No se pudo ingresar", false, HttpStatus.OK.value(), true, null);
+        if (this.ops.crearOrden(op) ==0) {
+            return buildApiResponse("No se pudo ingresar", false, HttpStatus.BAD_REQUEST, true, null);
         }
         lastidOrden= this.ops.getLastIdOrdenProduccion();
-        System.out.println("LAST ID_ORDEN: "+ lastidOrden);
         if (op.getMateriaPrima() != null) {
             for(MateriaPrimaDTO det: op.getMateriaPrima()){
                 if (this.ops.crearDetalleOrdenProduccion(lastidOrden, det.getIdProducto(), det.getCantidadUtilizar()) >0) {
@@ -90,31 +86,29 @@ public class OrdenProduccionController {
                 }
             }
         }
-        return buildApiResponse("Igresado exitosamente", true, HttpStatus.OK.value(), false, null);
+        return buildApiResponse("Igresado exitosamente", true, HttpStatus.OK, false, null);
     }
 
     @PostMapping("/proceso/{idOrdenProduccion}")
     public ResponseEntity<?> proceso_orden(@PathVariable("idOrdenProduccion") Integer idOrdenProduccion,@Valid @RequestBody OrdenProduccionProcesoDTO op){
-        System.out.println("recpciones: "+ op.toString());
         if (!this.ops.existsOrdenProducccionById(idOrdenProduccion)) {
-            return buildApiResponse("No existe orden", false, HttpStatus.OK.value(), false, null);
+            return buildApiResponse("No existe orden", false, HttpStatus.NOT_FOUND, false, null);
         }
-        if (this.ops.crearOrdenEnProduccion(idOrdenProduccion,op) <1) {
-            return buildApiResponse("No se puedo actualizar", false, HttpStatus.OK.value(), false, null);
+        if (this.ops.crearOrdenEnProduccion(idOrdenProduccion,op)==0) {
+            return buildApiResponse("No se puedo actualizar", false, HttpStatus.BAD_REQUEST, true, null);
         }
-        return buildApiResponse("Actualizado correctamente", true, HttpStatus.OK.value(), false, null);
+        return buildApiResponse("Orden ctualizada", true, HttpStatus.OK, false, null);
     }
 
     @PostMapping("/finalizada/{idOrdenProduccion}")
     public ResponseEntity<?> finalizada_orden(@PathVariable("idOrdenProduccion") Integer idOrdenProduccion, @RequestBody OrdenProduccionFinalizadaDTO op){
-        System.out.println("recpciones: "+ op.toString());
         if (!this.ops.existsOrdenProducccionById(idOrdenProduccion)) {
-            return buildApiResponse("No existe orden", false, HttpStatus.OK.value(), false, null);
+            return buildApiResponse("No existe orden", false, HttpStatus.NOT_FOUND, false, null);
         }
-        if (this.ops.crearOrdenEnFinalizar(idOrdenProduccion,op) <1) {
-            return buildApiResponse("No se puedo actualizar", false, HttpStatus.BAD_REQUEST.value(), true, null);
+        if (this.ops.crearOrdenEnFinalizar(idOrdenProduccion,op) ==0) {
+            return buildApiResponse("No se puedo finalizar", false, HttpStatus.BAD_REQUEST, true, null);
         }
-        return buildApiResponse("Actualizado correctamente", true, HttpStatus.OK.value(), false, null);
+        return buildApiResponse("Orden finalizada", true, HttpStatus.OK, false, null);
     }
 
     private Map<String, Object> buildValidationErrorResponse(BindingResult bindingResult) {
@@ -131,8 +125,10 @@ public class OrdenProduccionController {
         return response;
     }
 
-    private ResponseEntity<Object> buildApiResponse(String message, boolean success, int code, boolean error, Object data) {
-        ApiResponse response = new ApiResponse(message, success, code, error, data);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+
+    private ResponseEntity<Object> buildApiResponse(String message, boolean success, HttpStatus code, boolean error, Object data) {
+        ApiResponse response = new ApiResponse(message, success, code.value(), error, data);
+        return ResponseEntity.status(code).body(response);
     }
 }

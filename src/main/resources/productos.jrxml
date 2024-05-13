@@ -98,7 +98,7 @@
 							<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
 								<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 								<staticText>
-									<reportElement x="0" y="0" width="87" height="40" forecolor="#FFFFFF" uuid="3001f191-cfd3-4219-8526-222c0c437ed1"/>
+									<reportElement x="0" y="0" width="119" height="40" forecolor="#FFFFFF" uuid="3001f191-cfd3-4219-8526-222c0c437ed1"/>
 									<textElement textAlignment="Center" verticalAlignment="Middle">
 										<font fontName="SansSerif" size="12" isBold="true"/>
 									</textElement>

@@ -82,7 +82,7 @@
 									<textElement textAlignment="Center" verticalAlignment="Middle">
 										<font fontName="SansSerif" size="12" isBold="true"/>
 									</textElement>
-									<text><![CDATA[ID]]></text>
+									<text><![CDATA[No. de Orden]]></text>
 								</staticText>
 							</jr:columnHeader>
 							<jr:detailCell style="Table_TD" height="30">
@@ -104,7 +104,7 @@
 									<textElement textAlignment="Center" verticalAlignment="Middle">
 										<font fontName="SansSerif" size="12" isBold="true"/>
 									</textElement>
-									<text><![CDATA[Nombre]]></text>
+									<text><![CDATA[Cliente]]></text>
 								</staticText>
 							</jr:columnHeader>
 							<jr:detailCell style="Table_TD" height="30">
