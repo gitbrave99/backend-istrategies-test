@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApiResponseFinal {
-    public ResponseEntity<Object> buildApiResponse(String message, boolean success, int code, boolean error, Object data) {
-        ApiResponse response = new ApiResponse(message, success, code, error, data);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<Object> buildApiResponse(String message, boolean success, HttpStatus code, boolean error, Object data) {
+        ApiResponse response = new ApiResponse(message, success, code.value(), error, data);
+        return ResponseEntity.status(code).body(response);
     }
 }

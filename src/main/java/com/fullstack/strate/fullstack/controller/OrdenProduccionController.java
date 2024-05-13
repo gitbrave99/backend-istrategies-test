@@ -2,6 +2,8 @@ package com.fullstack.strate.fullstack.controller;
 
 import com.fullstack.strate.fullstack.dto.*;
 import com.fullstack.strate.fullstack.service.OrdenProduccionService;
+import com.fullstack.strate.fullstack.utils.ApiResponseFinal;
+import com.fullstack.strate.fullstack.utils.AuthorizationValidator;
 import jakarta.validation.Valid;
 import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +30,33 @@ public class OrdenProduccionController {
     @Autowired
     OrdenProduccionService ops;
 
+    @Autowired
+    AuthorizationValidator authorizationValidator;
 
+    @Autowired
+    ApiResponseFinal apiResponseFinal;
     @GetMapping("/estado-fecha")
-    public ResponseEntity<?> findAll(@RequestParam("estado") Integer estado, @RequestParam("fecha") Date fecha){
-        return ResponseEntity.status(HttpStatus.OK).body(this.ops.findOrdenFechaEntregaEstado(fecha, estado));
+    public ResponseEntity<?> findAll(@RequestParam("estado") Integer estado, @RequestParam("fecha") Date fecha,@RequestHeader("Authorization") String jwt){
+        if (authorizationValidator.isValidAuth(jwt) != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(this.ops.findOrdenFechaEntregaEstado(fecha, estado));
+        }
+        return apiResponseFinal.buildApiResponse("token invalido o expirado", true, HttpStatus.UNAUTHORIZED, true, null);
     }
 
     @GetMapping("/date")
-    public ResponseEntity<?> findAllByDate(@RequestParam("date") Date date){
-        return ResponseEntity.status(HttpStatus.OK).body(this.ops.findAllByDate(date));
+    public ResponseEntity<?> findAllByDate(@RequestParam("date") Date date,@RequestHeader("Authorization") String jwt){
+        if (authorizationValidator.isValidAuth(jwt) != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(this.ops.findAllByDate(date));
+        }
+        return apiResponseFinal.buildApiResponse("token invalido o expirado", true, HttpStatus.UNAUTHORIZED, true, null);
     }
 
     @GetMapping("")
-    public ResponseEntity<?> findAllDTOs(){
-        return ResponseEntity.status(HttpStatus.OK).body(this.ops.findAllDTO());
+    public ResponseEntity<?> findAllDTOs(@RequestHeader("Authorization") String jwt){
+        if (authorizationValidator.isValidAuth(jwt) != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(this.ops.findAllDTO());
+        }
+        return apiResponseFinal.buildApiResponse("token invalido o expirado", true, HttpStatus.UNAUTHORIZED, true, null);
     }
 
     @GetMapping("/export-pdf-all")
@@ -69,46 +84,56 @@ public class OrdenProduccionController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> create(@Valid @RequestBody OrdenProduccionIngresoDTO op, BindingResult bindingResult){
-        Integer lastidOrden=0;
-        if (bindingResult.hasErrors()) {
-            System.out.println("binding rsults: ");
-            return ResponseEntity.badRequest().body(buildValidationErrorResponse(bindingResult));
-        }
-        if (this.ops.crearOrden(op) ==0) {
-            return buildApiResponse("No se pudo ingresar", false, HttpStatus.BAD_REQUEST, true, null);
-        }
-        lastidOrden= this.ops.getLastIdOrdenProduccion();
-        if (op.getMateriaPrima() != null) {
-            for(MateriaPrimaDTO det: op.getMateriaPrima()){
-                if (this.ops.crearDetalleOrdenProduccion(lastidOrden, det.getIdProducto(), det.getCantidadUtilizar()) >0) {
-                    System.out.println("INGRESO ESPERADO: "+ lastidOrden+ " idprodu:"+ det.getIdProducto()+ " canti: "+ det.getCantidadUtilizar());
+    public ResponseEntity<?> create(@Valid @RequestBody OrdenProduccionIngresoDTO op, BindingResult bindingResult, @RequestHeader("Authorization") String jwt){
+        if (authorizationValidator.isValidAuth(jwt) != null) {
+            Integer lastidOrden = 0;
+            if (bindingResult.hasErrors()) {
+                System.out.println("binding rsults: ");
+                return ResponseEntity.badRequest().body(buildValidationErrorResponse(bindingResult));
+            }
+            if (this.ops.crearOrden(op) == 0) {
+                return apiResponseFinal.buildApiResponse("No se pudo ingresar", false, HttpStatus.BAD_REQUEST, true, null);
+            }
+            lastidOrden = this.ops.getLastIdOrdenProduccion();
+            if (op.getMateriaPrima() != null) {
+                for (MateriaPrimaDTO det : op.getMateriaPrima()) {
+                    if (this.ops.crearDetalleOrdenProduccion(lastidOrden, det.getIdProducto(), det.getCantidadUtilizar()) > 0) {
+                        System.out.println("INGRESO ESPERADO: " + lastidOrden + " idprodu:" + det.getIdProducto() + " canti: " + det.getCantidadUtilizar());
+                    }
                 }
             }
+            return apiResponseFinal.buildApiResponse("Igresado exitosamente", true, HttpStatus.OK, false, null);
         }
-        return buildApiResponse("Igresado exitosamente", true, HttpStatus.OK, false, null);
+        return apiResponseFinal.buildApiResponse("token invalido o expirado", true, HttpStatus.UNAUTHORIZED, true, null);
     }
 
     @PostMapping("/proceso/{idOrdenProduccion}")
-    public ResponseEntity<?> proceso_orden(@PathVariable("idOrdenProduccion") Integer idOrdenProduccion,@Valid @RequestBody OrdenProduccionProcesoDTO op){
+    public ResponseEntity<?> proceso_orden(@PathVariable("idOrdenProduccion") Integer idOrdenProduccion,@Valid @RequestBody OrdenProduccionProcesoDTO op, @RequestHeader("Authorization") String jwt){
+        if (authorizationValidator.isValidAuth(jwt) != null) {
+
         if (!this.ops.existsOrdenProducccionById(idOrdenProduccion)) {
-            return buildApiResponse("No existe orden", false, HttpStatus.NOT_FOUND, false, null);
+            return apiResponseFinal.buildApiResponse("No existe orden", false, HttpStatus.NOT_FOUND, false, null);
         }
         if (this.ops.crearOrdenEnProduccion(idOrdenProduccion,op)==0) {
-            return buildApiResponse("No se puedo actualizar", false, HttpStatus.BAD_REQUEST, true, null);
+            return apiResponseFinal.buildApiResponse("No se puedo actualizar", false, HttpStatus.BAD_REQUEST, true, null);
         }
-        return buildApiResponse("Orden ctualizada", true, HttpStatus.OK, false, null);
+        return apiResponseFinal.buildApiResponse("Orden ctualizada", true, HttpStatus.OK, false, null);
+        }
+        return apiResponseFinal.buildApiResponse("token invalido o expirado", true, HttpStatus.UNAUTHORIZED, true, null);
     }
 
     @PostMapping("/finalizada/{idOrdenProduccion}")
-    public ResponseEntity<?> finalizada_orden(@PathVariable("idOrdenProduccion") Integer idOrdenProduccion, @RequestBody OrdenProduccionFinalizadaDTO op){
+    public ResponseEntity<?> finalizada_orden(@PathVariable("idOrdenProduccion") Integer idOrdenProduccion, @RequestBody OrdenProduccionFinalizadaDTO op, @RequestHeader("Authorization") String jwt){
+        if (authorizationValidator.isValidAuth(jwt) != null) {
         if (!this.ops.existsOrdenProducccionById(idOrdenProduccion)) {
-            return buildApiResponse("No existe orden", false, HttpStatus.NOT_FOUND, false, null);
+            return apiResponseFinal.buildApiResponse("No existe orden", false, HttpStatus.NOT_FOUND, false, null);
         }
         if (this.ops.crearOrdenEnFinalizar(idOrdenProduccion,op) ==0) {
-            return buildApiResponse("No se puedo finalizar", false, HttpStatus.BAD_REQUEST, true, null);
+            return apiResponseFinal.buildApiResponse("No se puedo finalizar", false, HttpStatus.BAD_REQUEST, true, null);
         }
-        return buildApiResponse("Orden finalizada", true, HttpStatus.OK, false, null);
+        return apiResponseFinal.buildApiResponse("Orden finalizada", true, HttpStatus.OK, false, null);
+        }
+        return apiResponseFinal.buildApiResponse("token invalido o expirado", true, HttpStatus.UNAUTHORIZED, true, null);
     }
 
     private Map<String, Object> buildValidationErrorResponse(BindingResult bindingResult) {
@@ -123,12 +148,5 @@ public class OrdenProduccionController {
         }
         response.put("data", errors);
         return response;
-    }
-
-
-
-    private ResponseEntity<Object> buildApiResponse(String message, boolean success, HttpStatus code, boolean error, Object data) {
-        ApiResponse response = new ApiResponse(message, success, code.value(), error, data);
-        return ResponseEntity.status(code).body(response);
     }
 }
