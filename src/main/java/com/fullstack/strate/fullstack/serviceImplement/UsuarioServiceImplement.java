@@ -34,7 +34,6 @@ public class UsuarioServiceImplement implements UsuarioService {
     public UsuarioDTO login(UsuarioLoginDTO usl) {
         UsuarioDTO usuarioLogeado= new UsuarioDTO();
         UsuarioEntity userl = this.usuarioRepository.login(usl.getUsername());
-        System.out.println("usuario obtenido: "+ userl.getUsername());
 
         if (userl == null) {return null;}
         String passwordHashed= userl.getPassword();

@@ -15,5 +15,5 @@ import java.sql.Date;
 public class OrdenProduccionFinalizadaDTO {
     @NotEmpty(message = "La fecha de finalización no puede estar vacía")
     @NotNull(message = "La fecha de finalización no puede ser nula")
-    private Date fechaFinalizacion;
+    private String fechaFinalizacion;
 }

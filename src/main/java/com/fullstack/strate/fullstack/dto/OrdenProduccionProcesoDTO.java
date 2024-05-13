@@ -15,8 +15,8 @@ import java.sql.Date;
 @NoArgsConstructor
 public class OrdenProduccionProcesoDTO {
     @NotNull(message = "Fecha Válida")
-    @DateTimeFormat(pattern = "yyyy-MM-dd") // Formato de la fecha77
-    private Date    fechaEnProduccion;
+    //@DateTimeFormat(pattern = "yyyy-MM-dd") // Formato de la fecha77
+    private String    fechaEnProduccion;
 
     @NotNull(message = "Tipo linea no válido")
     @Positive(message = "Tipo linea no válido")

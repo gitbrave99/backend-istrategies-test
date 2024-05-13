@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public interface ProductoService {
+    ProductoEntity findProductoById(Integer idProducto);
     ArrayList<ProductoDTO> getListProductsDTOs();
     ArrayList<ProductoDTO> getListProductsByTypoDTos(Integer tipo);
     int save(ProductoDTO prod);

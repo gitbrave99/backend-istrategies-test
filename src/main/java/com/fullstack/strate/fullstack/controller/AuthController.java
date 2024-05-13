@@ -51,9 +51,9 @@ public class AuthController {
             responseData.put("usuario", usuarioLogueado.getUsername());
             responseData.put("tipousuario",usuarioLogueado.getIdUsuarioTipo());
             responseData.put("token", tokenJwt);
-            return apiResponseFinal.buildApiResponse("Login exitoso",true, HttpStatus.OK.value(), false, responseData);
+            return apiResponseFinal.buildApiResponse("Login exitoso",true, HttpStatus.OK, false, responseData);
         }
-        return apiResponseFinal.buildApiResponse("No se pudo iniciar sesión ",false, HttpStatus.CONFLICT.value(),
+        return apiResponseFinal.buildApiResponse("No se pudo iniciar sesión ",false, HttpStatus.CONFLICT,
                 true, null);
     }
 
@@ -68,17 +68,17 @@ public class AuthController {
                 tokenValid.setAnulado(true);
                 tokenValid.setExpired(true);
                 this.tokenService.updateToken(tokenValid);
-                return apiResponseFinal.buildApiResponse("logout exitoso", true, HttpStatus.OK.value(),false,null);
+                return apiResponseFinal.buildApiResponse("logout exitoso", true, HttpStatus.OK,false,null);
             }
         }
-        return apiResponseFinal.buildApiResponse("logout fallido", false, HttpStatus.CONFLICT.value(), true, null);
+        return apiResponseFinal.buildApiResponse("logout fallido", false, HttpStatus.CONFLICT, true, null);
     }
 
     @GetMapping("/demo")
     public ResponseEntity<?> demo(@RequestHeader("Authorization") String jwt) {
         if (authorizationValidator.isValidAuth(jwt) != null) {
-            return apiResponseFinal.buildApiResponse("LISTA RETORNADA", true, HttpStatus.OK.value(), true, null);
+            return apiResponseFinal.buildApiResponse("LISTA RETORNADA", true, HttpStatus.OK, true, null);
         }
-        return apiResponseFinal.buildApiResponse("token invalido o expirado", false, HttpStatus.UNAUTHORIZED.value(), true, null);
+        return apiResponseFinal.buildApiResponse("token invalido o expirado", false, HttpStatus.UNAUTHORIZED, true, null);
     }
 }

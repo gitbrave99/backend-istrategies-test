@@ -16,4 +16,15 @@ public class MateriaPrimaDTO {
     private String  descripcion;
     private Integer cantidadUtilizar;
     private String  unidad;
+
+    @Override
+    public String toString() {
+        return "MateriaPrimaDTO{" +
+                "idProducto=" + idProducto +
+                ", materiaPrima='" + materiaPrima + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", cantidadUtilizar=" + cantidadUtilizar +
+                ", unidad='" + unidad + '\'' +
+                '}';
+    }
 }

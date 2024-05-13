@@ -30,4 +30,6 @@ public interface ProductoRepository extends JpaRepository<ProductoEntity, Intege
 
     @Query(value = "SELECT p from ProductoEntity p where p.productotipo.idTipoProducto= :tipoproducto", nativeQuery = false)
     List<ProductoEntity> getProductosPorTipo(@Param("tipoproducto") Integer tipoproducto);
+
+    ProductoEntity findByIdProducto(Integer idProducto);
 }
