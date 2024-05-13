@@ -16,3 +16,5 @@ Proyecto Fullstack para La empresa Matinsa S.A. de C.V. requiere de una aplicaci
 - Configuración de java 21
 - Modificar archivo `applicacion.properties` y agregar el usuario y contraseña.
 - Correr clase principlal `FullstackApplication.java`
+- Url `http://localhost:8098/api/v1`
+- Url para el login `http://localhost:8098/api/v1/login`
