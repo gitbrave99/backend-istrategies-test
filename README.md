@@ -11,10 +11,23 @@ Proyecto Fullstack para La empresa Matinsa S.A. de C.V. requiere de una aplicaci
 - Maven
 
 ## Correr aplicación
-- Instalar base de datos
+- Crear base de datos
 - Cargar dependencias de Maven
 - Configuración de java 21
-- Modificar archivo `applicacion.properties` y agregar el usuario y contraseña.
+- Modificar archivo `applicacion.properties` y agregar el usuario y contraseña para conección con la base de datos.
 - Correr clase principlal `FullstackApplication.java`
 - Url `http://localhost:8098/api/v1`
-- Url para el login `http://localhost:8098/api/v1/login`
+- Url para el login `http://localhost:8098/api/v1/login`. Hay 2 usuarios de prueba, para el módulo de bodega el **usuario:** *bodega* y para producción el **usuario:** *produccion* con la **contraseña:** *123* .
+
+Si quiere crear más usuarios el endpoint `/usuario/create` lo hace enviándole el siguiente json
+```json
+{
+    "username": "username",
+    "password": "123",
+    "idUsuarioTipo": 1
+}
+```
+El **idUsuarioTipo** tiene 2 tipos
+1. Bodega
+2. Proucción
+
