@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin(origins = "**")
 @RestController
 public class AuthController {
 

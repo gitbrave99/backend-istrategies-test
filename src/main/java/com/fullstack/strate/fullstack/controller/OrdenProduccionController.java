@@ -21,7 +21,7 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin(origins = "**")
 @RestController
 @RequestMapping(value = "/orden-produccion")
 public class OrdenProduccionController {
